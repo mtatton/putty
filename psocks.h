@@ -9,7 +9,7 @@ typedef enum PsocksDirection { UP, DN } PsocksDirection;
 typedef struct PsocksDataSink {
     void (*free)(PsocksDataSink *);
     BinarySink *s[2];
-} PsocksDataSink;
+} PSockDataSink;
 static inline void pds_free(PsocksDataSink *pds)
 { pds->free(pds); }
 

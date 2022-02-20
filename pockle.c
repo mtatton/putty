@@ -134,7 +134,7 @@ PockleStatus pockle_add_prime(Pockle *pockle, mp_int *p,
 {
     MontyContext *mc = NULL;
     mp_int *x = NULL, *f = NULL, *w = NULL;
-    PockleStatus status;
+    PockleStatus status = POCKLE_FACTOR_NOT_KNOWN_PRIME;
 
     /*
      * We're going to try to verify that p is prime by using

@@ -18,7 +18,7 @@ bool got_crypt(void)
 {
     static bool attempted = false;
     static bool successful;
-    static HMODULE crypt;
+    //static HMODULE crypt;
 
     if (!attempted) {
         attempted = true;

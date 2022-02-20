@@ -100,6 +100,7 @@ static void scroll(Terminal *, int, int, int, bool);
 static void parse_optionalrgb(optionalrgb *out, unsigned *values);
 static void term_added_data(Terminal *term);
 static void term_update_raw_mouse_mode(Terminal *term);
+int xyz_ReceiveData(Terminal *term, const u_char *buffer, int len);
 
 static termline *newtermline(Terminal *term, int cols, bool bce)
 {
