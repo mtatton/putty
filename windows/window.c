@@ -26,6 +26,12 @@
 #include "winseat.h"
 #include "tree234.h"
 
+int xyz_Process(Backend *back, void *backhandle, Terminal *term);
+void xyz_ReceiveInit(Terminal *term);
+void xyz_StartSending(Terminal *term);
+void xyz_Cancel(Terminal *term);
+
+
 #ifndef NO_MULTIMON
 #include <multimon.h>
 #endif
@@ -55,6 +61,11 @@
 #define IDM_COPY      0x0190
 #define IDM_PASTE     0x01A0
 #define IDM_SPECIALSEP 0x0200
+
+#define IDM_XYZSTART  0x0210
+#define IDM_XYZUPLOAD 0x0220
+#define IDM_XYZABORT  0x0230
+
 
 #define IDM_SPECIAL_MIN 0x0400
 #define IDM_SPECIAL_MAX 0x0800
@@ -116,6 +127,9 @@ static void flip_full_screen(void);
 static void process_clipdata(HGLOBAL clipdata, bool unicode);
 static void setup_clipboards(Terminal *, Conf *);
 
+/* Z-Modem */
+void xyz_updateMenuItems(Terminal *term);
+
 /* Window layout information */
 static void reset_window(int);
 static int extra_width, extra_height;
@@ -135,6 +149,7 @@ static int kbd_codepage;
 
 static Ldisc *ldisc;
 static Backend *backend;
+static void *backhandle;
 
 static struct unicode_data ucsdata;
 static bool session_closed;
@@ -856,7 +871,11 @@ int WINAPI WinMain(HINSTANCE inst, HINSTANCE prev, LPSTR cmdline, int show)
                            == RESIZE_DISABLED) ? MF_GRAYED : MF_ENABLED,
                        IDM_FULLSCREEN, "&Full Screen");
             AppendMenu(m, MF_SEPARATOR, 0, 0);
-            if (has_help())
+	    AppendMenu(m, term->xyz_transfering?MF_GRAYED:MF_ENABLED, IDM_XYZSTART, "&Zmodem Receive");
+	    AppendMenu(m, term->xyz_transfering?MF_GRAYED:MF_ENABLED, IDM_XYZUPLOAD, "Zmodem &Upload");
+	    AppendMenu(m, !term->xyz_transfering?MF_GRAYED:MF_ENABLED, IDM_XYZABORT, "Zmodem &Abort");
+	    AppendMenu(m, MF_SEPARATOR, 0, 0);
+	            if (has_help())
                 AppendMenu(m, MF_ENABLED, IDM_HELP, "&Help");
             str = dupprintf("&About %s", appname);
             AppendMenu(m, MF_ENABLED, IDM_ABOUT, str);
@@ -935,7 +954,10 @@ int WINAPI WinMain(HINSTANCE inst, HINSTANCE prev, LPSTR cmdline, int show)
             HWND logbox = event_log_window();
             if (!(IsWindow(logbox) && IsDialogMessage(logbox, &msg)))
                 DispatchMessageW(&msg);
-
+	    if (xyz_Process(backend, backhandle, term)) { // NO GOOD
+		    continue;
+            }
+	
             /*
              * WM_NETEVENT messages seem to jump ahead of others in
              * the message queue. I'm not sure why; the docs for
@@ -2569,6 +2591,18 @@ static LRESULT CALLBACK WndProc(HWND hwnd, UINT message,
           case IDM_FULLSCREEN:
             flip_full_screen();
             break;
+          case IDM_XYZSTART:
+            xyz_ReceiveInit(term);
+            xyz_updateMenuItems(term);
+            break;
+          case IDM_XYZUPLOAD:
+            xyz_StartSending(term);
+            xyz_updateMenuItems(term);
+            break;
+          case IDM_XYZABORT:
+            xyz_Cancel(term);
+            xyz_updateMenuItems(term);
+            break;
           default:
             if (wParam >= IDM_SAVED_MIN && wParam < IDM_SAVED_MAX) {
                 SendMessage(hwnd, WM_SYSCOMMAND, IDM_SAVEDSESS, wParam);
@@ -4120,7 +4154,7 @@ static void init_winfuncs(void)
     HMODULE winmm_module = load_system32_dll("winmm.dll");
     HMODULE shcore_module = load_system32_dll("shcore.dll");
     GET_WINDOWS_FUNCTION(user32_module, FlashWindowEx);
-    GET_WINDOWS_FUNCTION(user32_module, ToUnicodeEx);
+    //GET_WINDOWS_FUNCTION(user32_module, ToUnicodeEx);
     GET_WINDOWS_FUNCTION_PP(winmm_module, PlaySound);
     GET_WINDOWS_FUNCTION_NO_TYPECHECK(shcore_module, GetDpiForMonitor);
     GET_WINDOWS_FUNCTION_NO_TYPECHECK(user32_module, GetSystemMetricsForDpi);
@@ -4825,6 +4859,11 @@ static void wintw_set_scrollbar(TermWin *tw, int total, int start, int page)
     si.nPos = start;
     if (wgs.term_hwnd)
         SetScrollInfo(wgs.term_hwnd, SB_VERT, &si, true);
+}
+
+int from_backend(void *frontend, int is_stderr, const char *data, int len)
+{
+    return term_data(term, is_stderr, data, len);
 }
 
 static bool wintw_setup_draw_ctx(TermWin *tw)
@@ -5861,3 +5900,13 @@ static bool win_seat_get_window_pixel_size(Seat *seat, int *x, int *y)
     *y = r.bottom - r.top;
     return true;
 }
+
+void xyz_updateMenuItems(Terminal *term)
+{
+	HMENU m = GetSystemMenu(wgs.term_hwnd, FALSE);
+	EnableMenuItem(m, IDM_XYZSTART, term->xyz_transfering?MF_GRAYED:MF_ENABLED);
+	EnableMenuItem(m, IDM_XYZUPLOAD, term->xyz_transfering?MF_GRAYED:MF_ENABLED);
+	EnableMenuItem(m, IDM_XYZABORT, !term->xyz_transfering?MF_GRAYED:MF_ENABLED);
+
+}
+

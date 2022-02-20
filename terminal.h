@@ -237,6 +237,10 @@ struct terminal_tag {
 
     struct unicode_data *ucsdata;
 
+    // xyz
+    int xyz_transfering;
+    struct zModemInternals *xyz_Internals;
+
     unsigned long last_graphic_char;
 
     /*

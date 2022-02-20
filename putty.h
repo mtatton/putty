@@ -727,6 +727,8 @@ extern const int be_default_protocol;
  */
 extern const char *const appname;
 
+int from_backend(void *frontend, int is_stderr, const char *data, int len);
+
 /*
  * Mechanism for getting text strings such as usernames and passwords
  * from the front-end.
@@ -1627,6 +1629,12 @@ NORETURN void cleanup_exit(int);
     X(INT, NONE, shadowboldoffset) /* in pixels */ \
     X(BOOL, NONE, crhaslf) \
     X(STR, NONE, winclass) \
+    X(STR, NONE, rzcommand) \
+    X(STR, NONE, rzoptions) \
+    X(STR, NONE, szcommand) \
+    X(STR, NONE, szoptions) \
+    X(STR, NONE, zdownloaddir) \
+
     /* end of list */
 
 /* Now define the actual enum of option keywords using that macro. */

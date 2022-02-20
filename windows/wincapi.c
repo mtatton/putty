@@ -41,9 +41,10 @@ char *capi_obfuscate_string(const char *realname)
     int i;
 
     cryptlen = strlen(realname) + 1;
-    cryptlen += CRYPTPROTECTMEMORY_BLOCK_SIZE - 1;
-    cryptlen /= CRYPTPROTECTMEMORY_BLOCK_SIZE;
-    cryptlen *= CRYPTPROTECTMEMORY_BLOCK_SIZE;
+    // 20220220 Unknown NT IV Compatibility
+    //cryptlen += CRYPTPROTECTMEMORY_BLOCK_SIZE - 1;
+    //cryptlen /= CRYPTPROTECTMEMORY_BLOCK_SIZE;
+    //cryptlen *= CRYPTPROTECTMEMORY_BLOCK_SIZE;
 
     cryptdata = snewn(cryptlen, char);
     memset(cryptdata, 0, cryptlen);
@@ -67,9 +68,10 @@ char *capi_obfuscate_string(const char *realname)
      * the absence of any plausible guess). So we don't abort if we
      * can't call CryptProtectMemory at all, or if it fails.
      */
-    if (got_crypt())
-        p_CryptProtectMemory(cryptdata, cryptlen,
-                             CRYPTPROTECTMEMORY_CROSS_PROCESS);
+    // 20220220 Unknown NT IV Compatibility
+    //if (got_crypt())
+    //    p_CryptProtectMemory(cryptdata, cryptlen,
+    //                         CRYPTPROTECTMEMORY_CROSS_PROCESS);
 
     /*
      * We don't want to give away the length of the hostname either,

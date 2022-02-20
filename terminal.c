@@ -2015,6 +2015,8 @@ Terminal *term_init(Conf *myconf, struct unicode_data *ucsdata, TermWin *win)
     term->basic_erase_char.truecolour.bg = optionalrgb_none;
     term->erase_char = term->basic_erase_char;
 
+    term->xyz_transfering = 0;
+    term->xyz_Internals = NULL;
     term->last_selected_text = NULL;
     term->last_selected_attr = NULL;
     term->last_selected_tc = NULL;
@@ -7454,8 +7456,12 @@ static void term_added_data(Terminal *term)
 
 size_t term_data(Terminal *term, bool is_stderr, const void *data, size_t len)
 {
-    bufchain_add(&term->inbuf, data, len);
-    term_added_data(term);
+    if (term->xyz_transfering && !is_stderr) {
+	return xyz_ReceiveData(term, data, len);
+    } else {
+      bufchain_add(&term->inbuf, data, len);
+      term_added_data(term);
+    }
 
     /*
      * term_out() always completely empties inbuf. Therefore,

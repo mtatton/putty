@@ -796,6 +796,13 @@ void save_open_settings(settings_w *sesskey, Conf *conf)
     write_setting_i(sesskey, "SUPDUPCharset", conf_get_int(conf, CONF_supdup_ascii_set));
     write_setting_b(sesskey, "SUPDUPMoreProcessing", conf_get_bool(conf, CONF_supdup_more));
     write_setting_b(sesskey, "SUPDUPScrolling", conf_get_bool(conf, CONF_supdup_scroll));
+
+    /* Z-Modem Settings */
+    write_setting_s(sesskey, "rzcommand", conf_get_str(conf, CONF_rzcommand));
+    write_setting_s(sesskey, "rzoptions", conf_get_str(conf, CONF_rzoptions));
+    write_setting_s(sesskey, "szcommand", conf_get_str(conf, CONF_szcommand));
+    write_setting_s(sesskey, "szoptions", conf_get_str(conf, CONF_szoptions));
+    write_setting_s(sesskey, "zdownloaddir", conf_get_str(conf, CONF_zdownloaddir));
 }
 
 bool load_settings(const char *section, Conf *conf)
@@ -1275,6 +1282,14 @@ void load_open_settings(settings_r *sesskey, Conf *conf)
     gppi(sesskey, "SUPDUPCharset", false, conf, CONF_supdup_ascii_set);
     gppb(sesskey, "SUPDUPMoreProcessing", false, conf, CONF_supdup_more);
     gppb(sesskey, "SUPDUPScrolling", false, conf, CONF_supdup_scroll);
+
+    /* z-modem settings */
+    gpps(sesskey, "rzCommand", "rz", conf, CONF_rzcommand);
+    gpps(sesskey, "rzOptions", "-e -v", conf, CONF_rzoptions);
+    gpps(sesskey, "szCommand", "sz", conf, CONF_szcommand);
+    gpps(sesskey, "szOptions", "-e -v", conf, CONF_szoptions);
+    gpps(sesskey, "zDownloadDir", "C:\\", conf, CONF_zdownloaddir);
+
 }
 
 bool do_defaults(const char *session, Conf *conf)

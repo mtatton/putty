@@ -250,8 +250,9 @@ static bool really_restrict_process_acl(char **error)
         PROCESS_CREATE_PROCESS | PROCESS_CREATE_THREAD |
         PROCESS_DUP_HANDLE |
         PROCESS_SET_QUOTA | PROCESS_SET_INFORMATION |
-        PROCESS_VM_OPERATION | PROCESS_VM_READ | PROCESS_VM_WRITE |
-        PROCESS_SUSPEND_RESUME;
+        PROCESS_VM_OPERATION | PROCESS_VM_READ | PROCESS_VM_WRITE;
+        // Windows NT 4.0 Compatibility
+        //| PROCESS_SUSPEND_RESUME;
 
     if (!getsids(error))
         goto cleanup;

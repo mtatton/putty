@@ -493,7 +493,7 @@ static void BinarySink_put_wpoint(
     BinarySink *bs, WeierstrassPoint *point, const struct ec_curve *curve,
     bool bare)
 {
-    strbuf *sb;
+    strbuf *sb = NULL;
     BinarySink *bs_inner;
 
     if (!bare) {

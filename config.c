@@ -3195,4 +3195,36 @@ void setup_config_box(struct controlbox *b, bool midsession,
                       conf_checkbox_handler,
                       I(CONF_supdup_scroll));
     }
+    // z-modem panel
+    ctrl_settitle(b, "Connection/ZModem",
+      "Options controlling Z Modem transfers");
+
+    s = ctrl_getset(b, "Connection/ZModem", "receive", "Receive");
+
+    ctrl_editbox(s, "Command", NO_SHORTCUT, 50,
+       HELPCTX(ssh_gssapi_libraries),
+       conf_editbox_handler, I(CONF_rzcommand), I(1));
+
+    ctrl_editbox(s, "Options", NO_SHORTCUT, 50,
+       HELPCTX(ssh_gssapi_libraries),
+       conf_editbox_handler, I(CONF_rzoptions), I(1));
+
+    s = ctrl_getset(b, "Connection/ZModem", "send", "Send");
+
+    ctrl_editbox(s, "Command", NO_SHORTCUT, 50,
+       HELPCTX(ssh_gssapi_libraries),
+       conf_editbox_handler, I(CONF_szcommand), I(1));
+
+    ctrl_editbox(s, "Options", NO_SHORTCUT, 50,
+       HELPCTX(ssh_gssapi_libraries),
+       conf_editbox_handler, I(CONF_szoptions), I(1));
+
+    s = ctrl_getset(b, "Connection/ZModem", "dir", "Download Dir");
+
+    ctrl_editbox(s, "Download Directory", NO_SHORTCUT, 50,
+       HELPCTX(ssh_gssapi_libraries),
+       conf_editbox_handler, I(CONF_zdownloaddir), I(1));
+
+
+
 }
