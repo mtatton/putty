@@ -871,7 +871,7 @@ int WINAPI WinMain(HINSTANCE inst, HINSTANCE prev, LPSTR cmdline, int show)
                            == RESIZE_DISABLED) ? MF_GRAYED : MF_ENABLED,
                        IDM_FULLSCREEN, "&Full Screen");
             AppendMenu(m, MF_SEPARATOR, 0, 0);
-	    AppendMenu(m, term->xyz_transfering?MF_GRAYED:MF_ENABLED, IDM_XYZSTART, "&Zmodem Receive");
+	    AppendMenu(m, term->xyz_transfering?MF_GRAYED:MF_ENABLED, IDM_XYZSTART, "Zmodem &Receive");
 	    AppendMenu(m, term->xyz_transfering?MF_GRAYED:MF_ENABLED, IDM_XYZUPLOAD, "Zmodem &Upload");
 	    AppendMenu(m, !term->xyz_transfering?MF_GRAYED:MF_ENABLED, IDM_XYZABORT, "Zmodem &Abort");
 	    AppendMenu(m, MF_SEPARATOR, 0, 0);
